@@ -1,24 +1,27 @@
-import { configureStore, createSlice, combineReducers } from '@reduxjs/toolkit';
+import { configureStore, createReducer, Store, AnyAction } from "@reduxjs/toolkit";
+import { Environment } from "./types";
 
-const rootSlice = createSlice({
-  name: '@root',
-  initialState: {},
-  reducers: {}
+const rootReducer = createReducer({}, (builder) => {
+  builder.addDefaultCase((state) => {
+    return state;
+  });
 });
 
-const rootReducer = combineReducers({})
-// export type RootState = ReturnType<typeof rootReducer>
+export type RootState = ReturnType<typeof rootReducer>;
 
-export const initStore = () => {
-  return configureStore({
-    devTools: process.env.NODE_ENV !== 'production',
-    reducer: {}
-  });
+export class EssentialStore {
+  private store: Store<RootState, AnyAction>;
+
+  constructor(env: Environment = 'local') {
+    this.store = configureStore({
+      devTools: env === 'production',
+      reducer: rootReducer
+    });
+
+    this.store.subscribe(() => {
+      console.log(this.store.getState());
+    });
+  }
+
+  add() {}
 }
-
-const store = initStore();
-
-// Infer the `RootState` and `AppDispatch` types from the store itself
-export type RootState = ReturnType<typeof store.getState>
-// Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
-export type AppDispatch = typeof store.dispatch
