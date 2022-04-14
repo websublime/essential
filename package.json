@@ -1,0 +1,61 @@
+{
+  "name": "@websublime/essential",
+  "version": "0.0.3",
+  "source": "./src",
+  "main": "./dist/essential.cjs.js",
+  "module": "./dist/essential.esm.js",
+  "types": "./dist/@types/index.d.ts",
+  "files": [
+    "dist/",
+    "./LICENSE.md",
+    "./README.md"
+  ],
+  "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:serve": "vitepress serve docs",
+    "docs": "api-documenter markdown --input-folder dist --output-folder docs/api",
+    "build": "yarn types && node scripts/build.js && yarn docs",
+    "types": "tsc --emitDeclarationOnly",
+    "test": "jest --verbose -i",
+    "release": "yarn changeset publish",
+    "debug": "node --inspect-brk $(npm bin)/jest --no-cache --runInBand"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@changesets/changelog-github": "^0.3.0",
+    "@changesets/cli": "^2.14.1",
+    "@changesets/get-github-info": "^0.5.0",
+    "@microsoft/api-documenter": "^7.11.0",
+    "@microsoft/api-extractor": "^7.12.0",
+    "@types/fs-extra": "^9.0.4",
+    "@types/jest": "^27.0.1",
+    "@types/node": "^16.11.12",
+    "esbuild": "^0.14.23",
+    "fs-extra": "^10.0.1",
+    "jest": "^27.5.1",
+    "ts-jest": "^27.1.3",
+    "typescript": "^4.5.2",
+    "vitepress": "^0.22.3"
+  },
+  "bugs": {
+    "url": "https://github.com/websublime/essential/issues"
+  },
+  "description": "Forms model",
+  "keywords": [
+    "typescript",
+    "forms",
+    "agnostic",
+    "lib"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/websublime/essential"
+  },
+  "author": {
+    "email": "miguel.marques.ramos@gmail.com",
+    "name": "Miguel Ramos",
+    "url": "https://miguelramos.dev"
+  }
+}

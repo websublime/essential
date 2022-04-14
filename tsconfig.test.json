@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react",
+    "lib": ["ES2019"],
+    "module": "commonjs",
+    "target": "ES2020"
+  },
+  "exclude": ["./tsconfig.json", "./scripts", "deprecated"],
+  "include": ["./**/*.ts", "./**/*.tsx", "./**/*.d.ts"]
+}

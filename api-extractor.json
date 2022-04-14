@@ -1,0 +1,46 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json",
+  "projectFolder": "./",
+  "mainEntryPointFilePath": "./declarations/index.d.ts",
+  "bundledPackages": [],
+  "compiler": {
+    "skipLibCheck": true,
+    "tsconfigFilePath": "./tsconfig.json"
+  },
+  "apiReport": {
+    "enabled": true,
+    "reportFileName": "essential.api.md",
+    "reportFolder": "./dist/docs/"
+  },
+  "docModel": {
+    "enabled": true,
+    "apiJsonFilePath": "./dist/essential.api.json"
+  },
+  "dtsRollup": {
+    "enabled": true,
+    "untrimmedFilePath": "./dist/@types/essential-raw.d.ts",
+    "betaTrimmedFilePath": "./dist/@types/essential-beta.d.ts",
+    "publicTrimmedFilePath": "./dist/@types/index.d.ts"
+  },
+  "tsdocMetadata": {
+    "enabled": true,
+    "tsdocMetadataFilePath": "./dist/tsdoc-metadata.json"
+  },
+  "messages": {
+    "compilerMessageReporting": {
+      "default": {
+        "logLevel": "warning"
+      }
+    },
+    "extractorMessageReporting": {
+      "default": {
+        "logLevel": "warning"
+      }
+    },
+    "tsdocMessageReporting": {
+      "default": {
+        "logLevel": "warning"
+      }
+    }
+  }
+}
