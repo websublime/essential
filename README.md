@@ -1,4 +1,4 @@
-# forms
+# Essential
 
 <p align="center" style="background: #4ecca3; text-align: center; width: 100%; margin-bottom: 2rem;">
   <img src="./white-logo.svg" alt="logo">
