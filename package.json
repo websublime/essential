@@ -19,7 +19,7 @@
     "types": "tsc --emitDeclarationOnly",
     "test": "jest --verbose -i",
     "release": "yarn changeset publish",
-    "debug": "node --inspect-brk $(npm bin)/jest --no-cache --runInBand"
+    "debug": "node --inspect $(npm bin)/jest --no-cache --runInBand"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.1"

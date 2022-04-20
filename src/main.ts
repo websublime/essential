@@ -12,18 +12,14 @@ declare global {
   }
 }
 
-const context = isSsr() ? { essential: null } : (window.top || window);
+const context: { essential?: EssentialStoreObject } = isSsr() ? {} : (window.top || window);
 
-const useStore = (env: Environment = 'local') => {
-  if(!context?.essential) {
-    Object.defineProperty(context, 'essential', {
-      get() {
-        return {
-          store: new EssentialStore(env)
-        }
-      }
-    });
+export const useStore = (env: Environment = 'local') => {
+  if(!context.essential) {
+    context.essential = {
+      store: new EssentialStore(env)
+    };
   }
 
-  return context?.essential?.store;
+  return context.essential.store;
 }
