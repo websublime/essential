@@ -5,6 +5,7 @@ import { Environment } from "./types";
 declare global {
   interface EssentialStoreObject {
     store: EssentialStore;
+    isStoreAvailable: () => boolean;
   }
 
   interface Window {
@@ -14,10 +15,15 @@ declare global {
 
 const context: { essential?: EssentialStoreObject } = isSsr() ? {} : (window.top || window);
 
+const isStoreAvailable = () => {
+  return !!context.essential?.store;
+}
+
 export const useStore = (env: Environment = 'local') => {
   if(!context.essential) {
     context.essential = {
-      store: new EssentialStore(env)
+      store: new EssentialStore(env),
+      isStoreAvailable: isStoreAvailable
     };
   }
 

@@ -13,16 +13,19 @@ describe('> Store', () => {
 
   test('Reducer', () => {
     //debugger;
+    
 
     class MyReducer extends EssentialReducer {
+      namespace = 'myreducer';
+
       get initial() {
         return { count: 0 };
       }
 
       get actions() {
         return [
-          {type: createAction('INCREMENT'), action: this.increment.bind(this) },
-          {type: createAction('DECREMENT'), action: this.decrement.bind(this) }
+          {action: createAction('INCREMENT'), reducer: this.increment.bind(this) },
+          {action: createAction('DECREMENT'), reducer: this.decrement.bind(this) }
         ];
       }
 
@@ -46,14 +49,26 @@ describe('> Store', () => {
 
       get actions() {
         return [
-          {type: createAction('PRINT'), action: this.log.bind(this) }
+          {action: createAction('PRINT'), reducer: this.log.bind(this) }
         ];
+      }
+
+      constructor(namespace: symbol|string) {
+        super(namespace);
+
+        this.initListeners();
       }
 
       log(state, action) {
         state.message = action.payload.message
 
         return state;
+      }
+
+      initListeners() {
+        this.addListener(({ state, action}) => {
+          console.log('FooReducer', {state, action});
+        });
       }
     }
 
