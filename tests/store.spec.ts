@@ -1,6 +1,6 @@
 import { createAction } from '@reduxjs/toolkit';
 import { EssentialReducer, EssentialStore, useStore } from '../src';
-import { uniqueID } from "../src/helpers";
+import { uniqueID } from '../src/helpers';
 
 describe('> Store', () => {
   let store: EssentialStore = null;
@@ -12,10 +12,11 @@ describe('> Store', () => {
   });
 
   test('Reducer', () => {
-    //debugger;
-    
 
-    class MyReducer extends EssentialReducer {
+    type MyReducerState = {count: number};
+    type MyReducerDispatchers = {increment(count: number): void, decrement(count: number): void};
+
+    class MyReducer extends EssentialReducer<MyReducerState, MyReducerDispatchers> {
       namespace = 'myreducer';
 
       get initial() {
@@ -24,68 +25,54 @@ describe('> Store', () => {
 
       get actions() {
         return [
-          {action: createAction('INCREMENT'), reducer: this.increment.bind(this) },
-          {action: createAction('DECREMENT'), reducer: this.decrement.bind(this) }
+          {action: createAction<{count: number}>('INCREMENT'), reducer: this.incrementReducer.bind(this) },
+          {action: createAction<{count: number}>('DECREMENT'), reducer: this.decrementReducer.bind(this) }
         ];
       }
 
-      increment(state, action) {
+      get dispatchers(): MyReducerDispatchers {
+        return {
+          increment: this.incrementDispatcher.bind(this),
+          decrement: this.decrementDispatcher.bind(this)
+        };
+      }
+
+      private incrementReducer(state, action) {
         state.count = state.count + action.payload.count
 
         return state;
       }
 
-      decrement(state, action) {
+      private decrementReducer(state, action) {
         state.count = state.count - action.payload.count
 
         return state;
       }
-    }
 
-    class FooReducer extends EssentialReducer {
-      get initial() {
-        return { message: null };
+      private incrementDispatcher(count = 1) {
+        const [first] = this.actions;
+
+        this.dispatch(first.action({ count }));
       }
 
-      get actions() {
-        return [
-          {action: createAction('PRINT'), reducer: this.log.bind(this) }
-        ];
-      }
+      private decrementDispatcher(count = 0) {
+        const [first, last] = this.actions;
 
-      constructor(namespace: symbol|string) {
-        super(namespace);
-
-        this.initListeners();
-      }
-
-      log(state, action) {
-        state.message = action.payload.message
-
-        return state;
-      }
-
-      initListeners() {
-        this.addListener(({ state, action}) => {
-          console.log('FooReducer', {state, action});
-        });
+        this.dispatch(last.action({ count }));
       }
     }
 
     const myReducer = new MyReducer(Symbol(uniqueID()));
-    const fooReducer = new FooReducer(Symbol(uniqueID()));
 
-    store.addReducer(myReducer);
-    store.addReducer(fooReducer);
+    const dispatchers = store.addReducer(myReducer);
 
-    const action = createAction<{count: number}>('INCREMENT');
-    const actionB = createAction<{count: number}>('DECREMENT');
-    const actionC = createAction<{message: string}>('PRINT');
-
-    store.dispatch(action({ count: 1}));
-    store.dispatch(action({ count: 1}));
-    store.dispatch(actionB({ count: 2}));
-    store.dispatch(actionC({ message: 'Hello World'}));
-
+    dispatchers.increment(1);
+    console.log(myReducer.getState(), myReducer.initial);
+    dispatchers.increment(1);
+    console.log(myReducer.getState(), myReducer.initial);
+    dispatchers.increment(1);
+    console.log(myReducer.getState(), myReducer.initial);
+    dispatchers.decrement(3);
+    console.log(myReducer.getState(), myReducer.initial);
   });
 });

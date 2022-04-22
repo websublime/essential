@@ -1,24 +1,32 @@
-import { createReducer, ListenerMiddlewareInstance, isAnyOf, PayloadActionCreator, createAction, AnyAction} from "@reduxjs/toolkit";
-import { ReducerWithInitialState } from "@reduxjs/toolkit/dist/createReducer";
-import { uniqueID } from "./helpers";
+import { createReducer, ListenerMiddlewareInstance, isAnyOf, PayloadActionCreator, createAction, AnyAction } from '@reduxjs/toolkit';
+import type { ReducerWithInitialState } from '@reduxjs/toolkit/dist/createReducer';
+import { uniqueID } from './helpers';
+import { EssentialReducerActions, EssentialReducerListener, EssentialReducerListenerParams } from './types';
 
-export abstract class EssentialReducer {
-  abstract get initial(): any;
+export abstract class EssentialReducer<EssentialReducerState extends unknown = any, EssentialDispatchers extends unknown = any> {
 
-  abstract get actions(): {reducer: any, action: PayloadActionCreator , defaults?: boolean}[];
+  abstract get initial(): EssentialReducerState;
 
-  public reducersMap: ReducerWithInitialState<any>;
+  abstract get actions(): Array<EssentialReducerActions>;
+
+  abstract get dispatchers(): EssentialDispatchers;
+
+  public reducersMap: ReducerWithInitialState<EssentialReducerState>;
 
   public namespace: symbol|string = Symbol(uniqueID());
 
-  private listeners: Array<{callback: (args: any) => void, priority: number}> = [];
+  private listeners: Array<EssentialReducerListener> = [];
+
+  declare dispatch: (action: AnyAction) => void;
+
+  declare getState: () => EssentialReducerState;
 
   constructor(key?: symbol|string) {
-    this.reducersMap = this.initReducers();
-
     if(key) {
       this.namespace = key;
     }
+
+    this.reducersMap = this.initReducers();
   }
 
   private initReducers() {
@@ -32,7 +40,7 @@ export abstract class EssentialReducer {
   }
 
   listen(listenerMiddleware: ListenerMiddlewareInstance) {
-    const actions = this.actions.reduce((acc, item) => acc.concat([item.action]), [] as PayloadActionCreator[]);
+    const actions = this.actions.reduce((acc, item) => acc.concat([item.action]), [] as PayloadActionCreator<any>[]);
 
     listenerMiddleware.startListening({
       matcher: isAnyOf(createAction('INIT_REDUCER'), ...actions),
@@ -46,7 +54,7 @@ export abstract class EssentialReducer {
     });
   }
 
-  addListener(callback: (args: {state: unknown, action: AnyAction}) => void, priority = 1): void {
+  addListener(callback: (args: EssentialReducerListenerParams) => void, priority = 1) {
     this.listeners.push({callback, priority});
   }
 }

@@ -21,8 +21,8 @@
     "release": "yarn changeset publish",
     "debug": "node --inspect $(npm bin)/jest --no-cache --runInBand"
   },
-  "engines" : { 
-    "node" : ">=18.0.0" 
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.1"
@@ -37,6 +37,8 @@
     "@types/jest": "^27.0.1",
     "@types/node": "^16.11.12",
     "esbuild": "^0.14.23",
+    "eslint": "^8.13.0",
+    "eslint-plugin-unicorn": "^42.0.0",
     "fs-extra": "^10.0.1",
     "jest": "^27.5.1",
     "ts-jest": "^27.1.3",

@@ -1,8 +1,14 @@
-import { isSsr } from "./helpers";
-import { EssentialStore } from "./store";
-import { Environment } from "./types";
+import { AnyAction } from '@reduxjs/toolkit';
+import { isSsr } from './helpers';
+import { EssentialStore } from './store';
+import { Environment } from './types';
 
 declare global {
+  interface EssentialReducer {
+    dispatch(action: AnyAction): void;
+    getState(): unknown;
+  }
+
   interface EssentialStoreObject {
     store: EssentialStore;
     isStoreAvailable: () => boolean;
