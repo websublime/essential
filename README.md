@@ -1,7 +1,7 @@
 # Essential
 
 <p align="center" style="background: #4ecca3; text-align: center; width: 100%; margin-bottom: 2rem;">
-  <img src="./black-logo.svg" alt="logo">
+  <img src="./logo.svg" alt="logo">
 </p>
 
 <p align="center">
