@@ -1,17 +1,18 @@
 import { createAction } from '@reduxjs/toolkit';
 import { EssentialReducer, EssentialStore, useStore } from '../src';
-import { uniqueID } from '../src/helpers';
 
 describe('> Store', () => {
   let store: EssentialStore = null;
 
-  test('Init', () => {
-    store = useStore()
+  beforeEach(() => {
+    store = useStore();
+  });
 
+  test('Should initialize store', () => {
     expect(store).toBeTruthy();
   });
 
-  test('Reducer', () => {
+  test('Should create a single reducer', () => {
 
     type MyReducerState = {count: number};
     type MyReducerDispatchers = {increment(count: number): void, decrement(count: number): void};
@@ -54,7 +55,7 @@ describe('> Store', () => {
       }
 
       private decrementDispatcher(count = 0) {
-        const [first, last] = this.actions;
+        const [_, last] = this.actions;
 
         this.dispatch(last.action({ count }));
       }
@@ -63,16 +64,19 @@ describe('> Store', () => {
     const dispatchers = store.buildReducer<MyReducerState, MyReducerDispatchers, typeof MyReducer>(MyReducer, 'myreducer');
 
     dispatchers.increment(1);
-    console.log(store.state);
+    expect(store.state.myreducer.count).toEqual(1);
+
     dispatchers.increment(1);
-    console.log(store.state);
+    expect(store.state.myreducer.count).toEqual(2);
+
     dispatchers.increment(1);
-    console.log(store.state);
+    expect(store.state.myreducer.count).toEqual(3);
+
     dispatchers.decrement(3);
-    console.log(store.state);
+    expect(store.state.myreducer.count).toEqual(0);
   });
 
-  test('Reducer Connection', () => {
+  test('Should create multiple reducers', () => {
     type MyFooState = {message: string};
     type MyFooDispatchers = {print(msg: string): void};
 
@@ -142,13 +146,64 @@ describe('> Store', () => {
     const dispatcherFoo = store.buildReducer<MyFooState, MyFooDispatchers, typeof MyFoo>(MyFoo, 'myfoo');
     const dispatcherBar = store.buildReducer<MyBarState, MyBarDispatchers, typeof MyBar>(MyBar, 'mybar');
 
-    const fooReducer = store.getReducer<MyFoo>('myfoo');
-
-    fooReducer.addListener(({ state, action}) => console.log(state, action));
-
     dispatcherFoo.print('Hello World');
     dispatcherBar.log('Message from space');
 
-    console.log(store.state);
+    expect(store.state.myfoo.message).toEqual('Hello World');
+    expect(store.state.mybar.log).toEqual('Message from space');
+  });
+
+  test('Should test listener', (done) => {
+    // { type: 'PRINT', payload: { message: 'Hello World' } }
+    type MyBarState = {log: string};
+    type MyBarDispatchers = {log(msg: string): void};
+
+    const LOG_ACTION = createAction<{log: string}>('LOG');
+
+    class MyBar extends EssentialReducer<MyBarState, MyBarDispatchers> {
+      get initial() {
+        return { log: null };
+      }
+
+      get actions() {
+        return [
+          {action: LOG_ACTION, reducer: this.printReducer.bind(this) }
+        ];
+      }
+
+      get dispatchers(): MyBarDispatchers {
+        return {
+          log: this.printDispatcher.bind(this)
+        };
+      }
+
+      private printReducer(state: MyBarState, action: ReturnType<typeof LOG_ACTION>) {
+        state.log = action.payload.log
+
+        return state;
+      }
+
+      private printDispatcher(log = '') {
+        const [first] = this.actions;
+
+        this.dispatch(first.action({ log }));
+      }
+    }
+
+    const dispatcherBar = store.buildReducer<MyBarState, MyBarDispatchers, typeof MyBar>(MyBar, 'mybar');
+
+    const barReducer = store.getReducer<MyBar>('mybar');
+
+    barReducer.addListener(({ state, action }: {state: {mybar: MyBarState}, action: ReturnType<typeof LOG_ACTION> }) => {
+      expect(action.type).toEqual('LOG');
+      expect(action.payload).toEqual({ log: 'Message from space' });
+      expect(state.mybar.log).toEqual('Message from space');
+      done();
+    });
+
+    expect(barReducer.initial.log).toEqual(null);
+    expect(barReducer.getReducerState()).toEqual({ log: 'Message from space' });
+
+    dispatcherBar.log('Message from space');
   });
 });

@@ -1,7 +1,14 @@
-import { AnyAction } from '@reduxjs/toolkit';
+/**
+ * Copyright Websublime All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://websublime.dev/license
+ */
+
+import { AnyAction, ConfigureStoreOptions } from '@reduxjs/toolkit';
+import { defineStoreOptions } from './config';
 import { isSsr } from './helpers';
 import { EssentialStore } from './store';
-import { Environment } from './types';
 
 declare global {
   interface EssentialReducer {
@@ -25,10 +32,12 @@ const isStoreAvailable = () => {
   return !!context.essential?.store;
 }
 
-export const useStore = (env: Environment = 'local') => {
+export const useStore = (storeOptions: ConfigureStoreOptions = {} as ConfigureStoreOptions) => {
   if(!context.essential) {
+    defineStoreOptions(storeOptions);
+
     context.essential = {
-      store: new EssentialStore(env),
+      store: new EssentialStore(),
       isStoreAvailable: isStoreAvailable
     };
   }

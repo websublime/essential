@@ -1,6 +1,6 @@
 {
   "name": "@websublime/essential",
-  "version": "0.0.3",
+  "version": "0.0.1",
   "source": "./src",
   "main": "./dist/essential.cjs.js",
   "module": "./dist/essential.esm.js",
@@ -19,13 +19,14 @@
     "types": "tsc --emitDeclarationOnly",
     "test": "jest --verbose -i",
     "release": "yarn changeset publish",
-    "debug": "node --inspect $(npm bin)/jest --no-cache --runInBand"
+    "debug": "NODE_ENV=local node --inspect $(npm bin)/jest --no-cache --runInBand"
   },
   "engines": {
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@reduxjs/toolkit": "^1.8.1"
+    "@reduxjs/toolkit": "^1.8.1",
+    "@swan-io/boxed": "^0.3.7"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^0.3.0",
@@ -48,11 +49,12 @@
   "bugs": {
     "url": "https://github.com/websublime/essential/issues"
   },
-  "description": "Forms model",
+  "description": "Redux Vanilla OOP",
   "keywords": [
     "typescript",
-    "forms",
-    "agnostic",
+    "redux",
+    "vanilla",
+    "oop",
     "lib"
   ],
   "license": "MIT",
