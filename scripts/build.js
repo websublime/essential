@@ -1,3 +1,6 @@
+/* eslint-disable unicorn/import-style */
+/* eslint-disable unicorn/prefer-module */
+
 /**
  * Copyright Websublime All Rights Reserved.
  *
@@ -22,7 +25,7 @@ async function buildPackage(format, outfile) {
     minify: true,
     format,
     sourcemap: true,
-    target: ["esnext", "node12.22.0"],//['chrome60', 'firefox60', 'safari11', 'edge18'],
+    target: ["esnext", "node18"],//['chrome60', 'firefox60', 'safari11', 'edge18'],
     outfile,
     external: [...external, 'esbuild']
   });

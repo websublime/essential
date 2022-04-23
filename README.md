@@ -20,6 +20,7 @@
 <p align="center">❄️ Essential Redux Store</p>
 
 Essential is an opinited implementation of redux toolkit in the form of OOP. It is designed for the browser but can also work on nodeJs.
+This implementation is a vanilla implementation to work on all frameworks or node.
 
 # Table of contents
 
