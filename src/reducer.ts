@@ -39,7 +39,7 @@ export abstract class EssentialReducer<EssentialReducerState extends unknown = a
     });
   }
 
-  listen(listenerMiddleware: ListenerMiddlewareInstance) {
+  initMiddleware(listenerMiddleware: ListenerMiddlewareInstance) {
     const actions = this.actions.reduce((acc, item) => acc.concat([item.action]), [] as PayloadActionCreator<any>[]);
 
     listenerMiddleware.startListening({

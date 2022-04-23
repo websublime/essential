@@ -8,18 +8,23 @@ const rootReducer = createReducer<Record<string, any>>({}, (builder) => {
   });
 });
 
+type Constructor<Proto = unknown> = new (...args: any[]) => Proto;
+
 export type RootState = ReturnType<typeof rootReducer>;
-export type EssentialGenericReducer = EssentialReducer & { dispatch(action: AnyAction): void; getState(): unknown };
+export type EssentialGenericReducer<State = unknown, Dispatchers = unknown> = EssentialReducer<State, Dispatchers> & { dispatch(action: AnyAction): void; getState(): unknown };
+export type EssentialConstructReducer<State, Dispatchers, Reducer = unknown> = EssentialGenericReducer<State, Dispatchers> & Constructor<Reducer>;
 
 export class EssentialStore {
   private store: Store<RootState, AnyAction>;
 
-  private reducers = new WeakMap<typeof this, Record<string, any>>();
+  private connections = new Map<symbol|string, EssentialGenericReducer>();
+
+  private reducers = new Map<symbol|string, Record<string, any>>();
 
   private listenerMiddleware: ListenerMiddlewareInstance;
 
   get state() {
-    return this.store.getState();
+    return Object.freeze(this.store.getState());
   }
 
   constructor(env: Environment = 'local') {
@@ -34,36 +39,47 @@ export class EssentialStore {
     });
   }
 
-  private setupReducer(essentialInstance: EssentialGenericReducer) {
-    essentialInstance.listen(this.listenerMiddleware);
+  private setupReducer(reducer: EssentialGenericReducer) {
+    const cachedReducers = Array.from(this.reducers.values()).reduce((acc, item) => acc = {...acc,...item}, {});
 
-    const { dispatch, getState } = this.store;
+    const reducerEntry = { [reducer.namespace.toString()]: reducer.reducersMap };
+    const reducersList = combineReducers({ ...cachedReducers, ...reducerEntry});
 
-    Object.defineProperties(essentialInstance, {
-      dispatch: {
-        enumerable: true,
-        writable: false,
-        value: dispatch
-      },
-      getState: {
-        enumerable: true,
-        writable: false,
-        value: getState
-      },
-    });
+    this.store.replaceReducer(reducersList);
+
+    return reducerEntry;
   }
 
-  addReducer<Reducer extends EssentialGenericReducer>(essentialReducer: Reducer) {
-    this.setupReducer(essentialReducer as unknown as EssentialGenericReducer);
+  private bootReducer<State, Dispatchers>(reducer: EssentialGenericReducer<State, Dispatchers>) {
+    reducer.initMiddleware(this.listenerMiddleware);
 
-    const cachedReducers = this.reducers.get(this) || {};
-    const reducer = combineReducers({ ...cachedReducers, [essentialReducer.namespace.toString()]: essentialReducer.reducersMap});
+    this.reducers.set(reducer.namespace, this.setupReducer(reducer as EssentialGenericReducer));
+    this.connections.set(reducer.namespace, reducer as EssentialGenericReducer);
 
-    this.store.replaceReducer(reducer);
+    return reducer.dispatchers;
+  }
 
-    this.reducers.set(this, {[essentialReducer.namespace.toString()]: essentialReducer.reducersMap});
+  addReducer<Reducer extends EssentialGenericReducer>(reducer: Reducer): Pick<Reducer, 'dispatchers'> {
+    const { dispatch, getState } = this.store
 
-    return essentialReducer.dispatchers as Reducer['dispatchers'];
+    Object.assign(reducer, {dispatch, getState});
+
+    return this.bootReducer(reducer) as Pick<Reducer, 'dispatchers'>;
+  }
+
+  buildReducer<State, Dispatchers, Reducer extends Constructor<EssentialGenericReducer<State, Dispatchers>>>(ReducerClass: Reducer, namespace: symbol|string) {
+
+    const { dispatch, getState } = this.store
+
+    Object.assign(ReducerClass.prototype, {dispatch, getState});
+
+    const proto = new ReducerClass(namespace);
+
+    return this.bootReducer<State, Dispatchers>(proto as EssentialGenericReducer<State, Dispatchers>);
+  }
+
+  getReducer<Reducer = EssentialGenericReducer>(namespace: symbol|string): Reducer {
+    return this.connections.get(namespace) as unknown as Reducer;
   }
 
   pipe(...args: [() => any]) {}
