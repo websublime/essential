@@ -8,8 +8,7 @@
 import { AnyAction, combineReducers } from '@reduxjs/toolkit';
 import { EssentialReducer } from './reducer';
 import { useRedux, RootState } from './redux';
-
-type Constructor<Proto = unknown> = new (...args: any[]) => Proto;
+import { Constructor } from './types';
 
 export type EssentialGenericReducer<State = unknown, Dispatchers = unknown> = EssentialReducer<State, Dispatchers> & { dispatch(action: AnyAction): void; getState(): unknown };
 export type EssentialConstructReducer<State, Dispatchers, Reducer = unknown> = EssentialGenericReducer<State, Dispatchers> & Constructor<Reducer>;
@@ -62,5 +61,5 @@ export class EssentialStore {
     return this.connections.get(namespace) as unknown as Reducer;
   }
 
-  pipe(...args: [() => any]) {}
+  // pipe(...args: [() => any]) {}
 }

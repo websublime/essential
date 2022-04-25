@@ -9,13 +9,13 @@
  */
 
 const { build } = require('esbuild');
-const { dependencies = {} } = require('../package.json');
+// const { dependencies = {} } = require('../package.json');
 const { join, resolve } = require('path');
 const { ensureDirSync, remove } = require('fs-extra');
 
 const { Extractor, ExtractorConfig } = require('@microsoft/api-extractor');
 
-const external = Object.entries(dependencies).map(([key]) => key);
+//c onst external = Object.entries(dependencies).map(([key]) => key);
 const root = process.cwd();
 
 async function buildPackage(format, outfile) {
@@ -27,7 +27,7 @@ async function buildPackage(format, outfile) {
     sourcemap: true,
     target: ["esnext", "node18"],//['chrome60', 'firefox60', 'safari11', 'edge18'],
     outfile,
-    external: [...external, 'esbuild']
+    external: ['esbuild']
   });
 }
 

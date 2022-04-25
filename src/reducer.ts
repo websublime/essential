@@ -19,7 +19,6 @@ export abstract class EssentialReducer<EssentialReducerState = any, EssentialDis
    * Initial is the default or initial state that should be applied
    * when creating reducers or to use it to reste state to initial form
    *
-   * @return {EssentialReducerState} - Initial reducer store state
    * @public
    */
   abstract get initial(): EssentialReducerState;
@@ -28,7 +27,6 @@ export abstract class EssentialReducer<EssentialReducerState = any, EssentialDis
    * Actions are defined in the signature format of EssentialReducerActions
    * and they will be use to create the cases to trigger reducers.
    *
-   * @return {Array<EssentialReducerActions>} - List of EssentialReducerActions defined
    * @public
    */
   abstract get actions(): Array<EssentialReducerActions>;
@@ -37,11 +35,13 @@ export abstract class EssentialReducer<EssentialReducerState = any, EssentialDis
    * Dispatchers object to use in public visibility where Action will
    * be triggered.
    *
-   * @return {EssentialDispatchers} [description]
    * public
    */
   abstract get dispatchers(): EssentialDispatchers;
 
+  /**
+   * Map of reducers
+   */
   public reducersMap: ReducerWithInitialState<EssentialReducerState>;
 
   /**
@@ -52,10 +52,26 @@ export abstract class EssentialReducer<EssentialReducerState = any, EssentialDis
    */
   public namespace: symbol|string = Symbol(uniqueID());
 
+  /**
+   * List of functions that should be called on every action trigger
+   *
+   * @private
+   */
   private listeners: Array<EssentialReducerListener> = [];
 
+  /**
+   * Hook function to customize construct lifecycle
+   *
+   * @public
+   */
   bootstrap?: () => void;
 
+
+  /**
+   * Redux toolkit reference
+   *
+   * @private
+   */
   private get redux() {
     return useRedux();
   }
@@ -75,6 +91,11 @@ export abstract class EssentialReducer<EssentialReducerState = any, EssentialDis
     }
   }
 
+  /**
+   * Create reducers from actions definition list
+   *
+   * @private
+   */
   private initReducers() {
     return createReducer(this.initial, (builder) => {
       this.actions.forEach(item => {
@@ -85,6 +106,13 @@ export abstract class EssentialReducer<EssentialReducerState = any, EssentialDis
     });
   }
 
+  /**
+   * Register callbacks functions and listen to reducer changes.
+   *
+   * @param listenerMiddleware - Redux middleware reference
+   *
+   * @private
+   */
   private initMiddleware(listenerMiddleware: ListenerMiddlewareInstance) {
     const actions = this.actions.reduce((acc, item) => acc.concat([item.action]), [] as PayloadActionCreator<any>[]);
 
@@ -100,18 +128,33 @@ export abstract class EssentialReducer<EssentialReducerState = any, EssentialDis
     });
   }
 
+  /**
+   * Dispatch a action to redux
+   *
+   * @param action - Action to dispatch
+   */
   public dispatch(action: AnyAction) {
     const { store } = this.redux;
 
     return store.dispatch(action)
   }
 
+  /**
+   * Get global state
+   *
+   * @public
+   */
   public getState() {
     const { store } = this.redux;
 
     return store.getState() as State<EssentialReducerState>;
   }
 
+  /**
+   * Get reducer namespace state
+   *
+   * @public
+   */
   public getReducerState(): EssentialReducerState {
     const { store } = this.redux;
     const state = store.getState() as State<EssentialReducerState>;
@@ -119,6 +162,12 @@ export abstract class EssentialReducer<EssentialReducerState = any, EssentialDis
     return state[this.namespace.toString()];
   }
 
+  /**
+   * Register a function to be called when reducer change
+   *
+   * @param callback - Function to call on reducer state change
+   * @param priority - Priority on the stack
+   */
   addListener(callback: (args: EssentialReducerListenerParams) => void, priority = 1) {
     this.listeners.push({callback, priority});
   }
