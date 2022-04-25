@@ -7,6 +7,9 @@
 
 import type { AnyAction, PayloadActionCreator, Store } from '@reduxjs/toolkit';
 import type { ReducerWithInitialState } from '@reduxjs/toolkit/dist/createReducer';
+import { EssentialReducer } from './reducer';
+
+export type Constructor<Proto = unknown> = new (...args: any[]) => Proto;
 
 export type Environment = 'local'|'production'|'development'|'staging'|'test';
 
@@ -26,7 +29,7 @@ export interface EssentialReducerActions<Payload = any> {
   defaults?: boolean;
 }
 
-export interface EssentialReducerImplementation {
-  dispatch(action: AnyAction): any;
-  getState(): Store;
-}
+type EssentialAbsctractReducer<ReducerState, ReducerDispatchers> = EssentialReducer<ReducerState, ReducerDispatchers>;
+
+// interface EssentialReducerImplementation extends EssentialReducer
+

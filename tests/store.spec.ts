@@ -17,6 +17,9 @@ describe('> Store', () => {
     type MyReducerState = {count: number};
     type MyReducerDispatchers = {increment(count: number): void, decrement(count: number): void};
 
+    const INCREMENT_ACTION = createAction<MyReducerState>('INCREMENT');
+    const DECREMENT_ACTION = createAction<MyReducerState>('DECREMENT');
+
     class MyReducer extends EssentialReducer<MyReducerState, MyReducerDispatchers> {
       get initial(): MyReducerState {
         return { count: 0 };
@@ -24,8 +27,8 @@ describe('> Store', () => {
 
       get actions() {
         return [
-          {action: createAction<{count: number}>('INCREMENT'), reducer: this.incrementReducer.bind(this) },
-          {action: createAction<{count: number}>('DECREMENT'), reducer: this.decrementReducer.bind(this) }
+          {action: INCREMENT_ACTION, reducer: this.incrementReducer.bind(this) },
+          {action: DECREMENT_ACTION, reducer: this.decrementReducer.bind(this) }
         ];
       }
 
@@ -36,13 +39,13 @@ describe('> Store', () => {
         };
       }
 
-      private incrementReducer(state, action) {
+      private incrementReducer(state: MyReducerState, action: ReturnType<typeof INCREMENT_ACTION>) {
         state.count = state.count + action.payload.count
 
         return state;
       }
 
-      private decrementReducer(state, action) {
+      private decrementReducer(state: MyReducerState, action: ReturnType<typeof DECREMENT_ACTION>) {
         state.count = state.count - action.payload.count
 
         return state;
@@ -80,6 +83,8 @@ describe('> Store', () => {
     type MyFooState = {message: string};
     type MyFooDispatchers = {print(msg: string): void};
 
+    const PRINT_ACTION = createAction<MyFooState>('PRINT');
+
     class MyFoo extends EssentialReducer<MyFooState, MyFooDispatchers> {
       get initial() {
         return { message: null };
@@ -87,7 +92,7 @@ describe('> Store', () => {
 
       get actions() {
         return [
-          {action: createAction<{message: string}>('PRINT'), reducer: this.printReducer.bind(this) }
+          {action: PRINT_ACTION, reducer: this.printReducer.bind(this) }
         ];
       }
 
@@ -97,7 +102,7 @@ describe('> Store', () => {
         };
       }
 
-      private printReducer(state, action) {
+      private printReducer(state: MyFooState, action: ReturnType<typeof PRINT_ACTION>) {
         state.message = action.payload.message
 
         return state;
@@ -113,6 +118,8 @@ describe('> Store', () => {
     type MyBarState = {log: string};
     type MyBarDispatchers = {log(msg: string): void};
 
+    const LOG_ACTION = createAction<MyBarState>('LOG');
+
     class MyBar extends EssentialReducer<MyBarState, MyBarDispatchers> {
       get initial() {
         return { log: null };
@@ -120,7 +127,7 @@ describe('> Store', () => {
 
       get actions() {
         return [
-          {action: createAction<{log: string}>('LOG'), reducer: this.printReducer.bind(this) }
+          {action: LOG_ACTION, reducer: this.printReducer.bind(this) }
         ];
       }
 
@@ -130,7 +137,7 @@ describe('> Store', () => {
         };
       }
 
-      private printReducer(state, action) {
+      private printReducer(state: MyBarState, action: ReturnType<typeof LOG_ACTION>) {
         state.log = action.payload.log
 
         return state;
@@ -154,11 +161,10 @@ describe('> Store', () => {
   });
 
   test('Should test listener', (done) => {
-    // { type: 'PRINT', payload: { message: 'Hello World' } }
     type MyBarState = {log: string};
     type MyBarDispatchers = {log(msg: string): void};
 
-    const LOG_ACTION = createAction<{log: string}>('LOG');
+    const LOG_ACTION = createAction<MyBarState>('LOG');
 
     class MyBar extends EssentialReducer<MyBarState, MyBarDispatchers> {
       get initial() {
