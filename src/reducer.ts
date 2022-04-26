@@ -5,7 +5,7 @@
  * found in the LICENSE file at https://websublime.dev/license
  */
 
-import { createReducer, ListenerMiddlewareInstance, isAnyOf, PayloadActionCreator, createAction, AnyAction } from '@reduxjs/toolkit';
+import { createReducer, ListenerMiddlewareInstance, isAnyOf, PayloadActionCreator, createAction, AnyAction, Store } from '@reduxjs/toolkit';
 import type { ReducerWithInitialState } from '@reduxjs/toolkit/dist/createReducer';
 import { uniqueID } from './helpers';
 import { useRedux, RootState } from './redux';
@@ -21,7 +21,7 @@ export abstract class EssentialReducer<EssentialReducerState = any, EssentialDis
    *
    * @public
    */
-  abstract get initial(): EssentialReducerState;
+  abstract readonly initial: EssentialReducerState;
 
   /**
    * Actions are defined in the signature format of EssentialReducerActions
@@ -29,7 +29,7 @@ export abstract class EssentialReducer<EssentialReducerState = any, EssentialDis
    *
    * @public
    */
-  abstract get actions(): Array<EssentialReducerActions>;
+  abstract readonly actions: Array<EssentialReducerActions>;
 
   /**
    * Dispatchers object to use in public visibility where Action will
@@ -37,7 +37,7 @@ export abstract class EssentialReducer<EssentialReducerState = any, EssentialDis
    *
    * public
    */
-  abstract get dispatchers(): EssentialDispatchers;
+  abstract readonly dispatchers: EssentialDispatchers;
 
   /**
    * Map of reducers
@@ -64,7 +64,14 @@ export abstract class EssentialReducer<EssentialReducerState = any, EssentialDis
    *
    * @public
    */
-  bootstrap?: () => void;
+  bootstrap?(): void;
+
+  /**
+   * Hook function to customize before dispatch
+   *
+   * @public
+   */
+  beforeDispatch?(args: { store: Store, action: AnyAction }): void;
 
 
   /**
@@ -136,7 +143,11 @@ export abstract class EssentialReducer<EssentialReducerState = any, EssentialDis
   public dispatch(action: AnyAction) {
     const { store } = this.redux;
 
-    return store.dispatch(action)
+    if(this.beforeDispatch) {
+      this.beforeDispatch({ store, action });
+    }
+
+    return store.dispatch(action);
   }
 
   /**

@@ -11,4 +11,4 @@ export { EssentialReducer } from './reducer';
 export { EssentialStore } from './store';
 export { RootState } from './redux';
 export { defineStoreOptions } from './config';
-export { createAction, Store } from '@reduxjs/toolkit';
+export { createAction, createSelector, Store } from '@reduxjs/toolkit';

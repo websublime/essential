@@ -3,8 +3,9 @@ name: Deploy Static Docs
 on:
   push:
     branches:
-      - master
-      - main
+      - notYet
+#      - master
+#      - main
 env:
   CI: true
 

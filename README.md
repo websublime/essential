@@ -36,7 +36,83 @@ This implementation is a vanilla implementation to work on all frameworks or nod
 
 [(Back to top)](#table-of-contents)
 
-To be documented
+Store is a singleton instance where you can use is as:
+
+```ts
+import { useStore } from '@websublime/essential';
+
+const store = useStore();
+```
+
+Create a class  that will be responsable for the partial state of your global state. This reducer class is extended from or base class.
+
+```ts
+import { EssentialReducer, createAction } from '@websublime/essential';
+
+type MyReducerState = { count: number };
+type MyReducerDispatchers = {increment(count: number): void, decrement(count: number): void};
+
+const INCREMENT_ACTION = createAction<MyReducerState>('INCREMENT');
+const DECREMENT_ACTION = createAction<MyReducerState>('DECREMENT');
+
+class MyReducer extends EssentialReducer<MyReducerState, MyReducerDispatchers> {
+  get initial(): MyReducerState {
+    return { count: 0 };
+  }
+
+  get actions() {
+    return [
+      {action: INCREMENT_ACTION, reducer: this.incrementReducer.bind(this) },
+      {action: DECREMENT_ACTION, reducer: this.decrementReducer.bind(this) }
+    ];
+  }
+
+  get dispatchers(): MyReducerDispatchers {
+    return {
+      increment: this.incrementDispatcher.bind(this),
+      decrement: this.decrementDispatcher.bind(this)
+    };
+  }
+
+  private incrementReducer(state: MyReducerState, action: ReturnType<typeof INCREMENT_ACTION>) {
+    state.count = state.count + action.payload.count
+
+    return state;
+  }
+
+  private decrementReducer(state: MyReducerState, action: ReturnType<typeof DECREMENT_ACTION>) {
+    state.count = state.count - action.payload.count
+
+    return state;
+  }
+
+  private incrementDispatcher(count = 1) {
+    const [first] = this.actions;
+
+    this.dispatch(first.action({ count }));
+  }
+
+  private decrementDispatcher(count = 0) {
+    const [_, last] = this.actions;
+
+    this.dispatch(last.action({ count }));
+  }
+}
+```
+
+You can then register/build this reducer class in the store
+
+```ts
+const dispatchers = store.buildReducer<MyReducerState, MyReducerDispatchers, typeof MyReducer>(MyReducer, 'myreducer');
+```
+
+After being created the dispatchers object is returned and you can just dispatch any action you have defined on dispatchers property.
+
+```ts
+dispatchers.increment(1);
+```
+
+To be documented (more examples on tests like async, listeners).
 
 # Installation
 

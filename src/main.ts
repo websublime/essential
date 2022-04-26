@@ -19,6 +19,7 @@ declare global {
   interface EssentialStoreObject {
     store: EssentialStore;
     isStoreAvailable: () => boolean;
+    options: ConfigureStoreOptions;
   }
 
   interface Window {
@@ -34,12 +35,13 @@ const isStoreAvailable = () => {
 
 export const useStore = (storeOptions: ConfigureStoreOptions = {} as ConfigureStoreOptions) => {
   if(!context.essential) {
-    defineStoreOptions(storeOptions);
+    const options = defineStoreOptions(storeOptions);
 
-    context.essential = {
+    context.essential = Object.seal({
       store: new EssentialStore(),
-      isStoreAvailable: isStoreAvailable
-    };
+      isStoreAvailable: isStoreAvailable,
+      options
+    });
   }
 
   return context.essential.store;

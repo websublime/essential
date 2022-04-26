@@ -10,24 +10,54 @@ import { EssentialReducer } from './reducer';
 import { useRedux, RootState } from './redux';
 import { Constructor } from './types';
 
-export type EssentialGenericReducer<State = unknown, Dispatchers = unknown> = EssentialReducer<State, Dispatchers> & { dispatch(action: AnyAction): void; getState(): unknown };
+export interface EssentialGeneric {
+  dispatch(action: AnyAction): void;
+  getState(): unknown;
+}
+
+export type EssentialGenericReducer<State = unknown, Dispatchers = unknown> = EssentialReducer<State, Dispatchers> & EssentialGeneric;
 export type EssentialConstructReducer<State, Dispatchers, Reducer = unknown> = EssentialGenericReducer<State, Dispatchers> & Constructor<Reducer>;
 
 export class EssentialStore {
+  /**
+   * Reducers instances
+   *
+   * @private
+   */
   private connections = new Map<symbol|string, EssentialGenericReducer>();
 
+  /**
+   * Reducers actions definition
+   *
+   * @private
+   */
   private reducers = new Map<symbol|string, Record<string, any>>();
 
+  /**
+   * Global state
+   *
+   * @public
+   */
   get state(): RootState {
     const { store } = this.redux;
 
     return store.getState();
   }
 
+  /**
+   * Redux api
+   *
+   * @private
+   */
   private get redux() {
     return useRedux();
   }
 
+  /**
+   * Recreate store reducers
+   *
+   * @param reducer - Reducer map
+   */
   private setupReducer(reducer: EssentialGenericReducer) {
     const { store } = this.redux;
     const cachedReducers = Array.from(this.reducers.values()).reduce((acc, item) => acc = {...acc,...item}, {});
@@ -40,6 +70,11 @@ export class EssentialStore {
     return reducerEntry;
   }
 
+  /**
+   * Caches reducers actions and instances
+   *
+   * @private
+   */
   private bootReducer<State, Dispatchers>(reducer: EssentialGenericReducer<State, Dispatchers>) {
     this.reducers.set(reducer.namespace, this.setupReducer(reducer as EssentialGenericReducer));
     this.connections.set(reducer.namespace, reducer as EssentialGenericReducer);
@@ -47,19 +82,41 @@ export class EssentialStore {
     return reducer.dispatchers;
   }
 
+  /**
+   * Adds a reducer instance
+   *
+   * @public
+   */
   addReducer<Reducer extends EssentialGenericReducer>(reducer: Reducer): Pick<Reducer, 'dispatchers'> {
     return this.bootReducer(reducer) as Pick<Reducer, 'dispatchers'>;
   }
 
+  /**
+   * Create an instance from reducer class
+   *
+   * @public
+   */
   buildReducer<State, Dispatchers, Reducer extends Constructor<EssentialGenericReducer<State, Dispatchers>>>(ReducerClass: Reducer, namespace: symbol|string) {
     const proto = new ReducerClass(namespace);
 
     return this.bootReducer<State, Dispatchers>(proto as EssentialGenericReducer<State, Dispatchers>);
   }
 
+  /**
+   * Grab a reducer instance
+   *
+   * @public
+   */
   getReducer<Reducer = EssentialGenericReducer>(namespace: symbol|string): Reducer {
     return this.connections.get(namespace) as unknown as Reducer;
   }
 
-  // pipe(...args: [() => any]) {}
+  /*
+  pipe(inputSelectors: [], resultFunc: () => any)
+  pipe(args: [(state: any) => any]) {
+    const initState = (state: RootState) => state;
+    const selector = createSelector(initState, ...args)
+    return selector(this.state);
+  }
+  */
 }
