@@ -1,4 +1,4 @@
-import { createAction } from '@reduxjs/toolkit';
+import { createAction, Store } from '@reduxjs/toolkit';
 import { EssentialReducer, EssentialStore, useStore } from '../src';
 
 describe('> Store', () => {
@@ -121,7 +121,7 @@ describe('> Store', () => {
     const LOG_ACTION = createAction<MyBarState>('LOG');
 
     class MyBar extends EssentialReducer<MyBarState, MyBarDispatchers> {
-      get initial() {
+      get initial(): MyBarState {
         return { log: null };
       }
 
@@ -137,7 +137,7 @@ describe('> Store', () => {
         };
       }
 
-      private printReducer(state: MyBarState, action: ReturnType<typeof LOG_ACTION>) {
+      private printReducer(state: MyBarState, action: ReturnType<typeof LOG_ACTION>): MyBarState {
         state.log = action.payload.log
 
         return state;
@@ -211,5 +211,53 @@ describe('> Store', () => {
     expect(barReducer.getReducerState()).toEqual({ log: 'Message from space' });
 
     dispatcherBar.log('Message from space');
+  });
+
+  test('Should execute hook before dispatch', (done) => {
+    type MyBarState = {hook: string};
+    type MyBarDispatchers = {log(msg: string): void};
+
+    const HOOK_ACTION = createAction<MyBarState>('HOOK');
+
+    class MyHook extends EssentialReducer<MyBarState, MyBarDispatchers> {
+      get initial() {
+        return { hook: null };
+      }
+
+      get actions() {
+        return [
+          {action: HOOK_ACTION, reducer: this.printReducer.bind(this) }
+        ];
+      }
+
+      get dispatchers(): MyBarDispatchers {
+        return {
+          log: this.printDispatcher.bind(this)
+        };
+      }
+
+      beforeDispatch({ store }: { store: Store }): void {
+        const state = store.getState();
+
+        expect(state.myhook.hook).toEqual(null);
+        done();
+      }
+
+      private printReducer(state: MyBarState, action: ReturnType<typeof HOOK_ACTION>) {
+        state.hook = action.payload.hook
+
+        return state;
+      }
+
+      private printDispatcher(hook = '') {
+        const [first] = this.actions;
+
+        this.dispatch(first.action({ hook }));
+      }
+    }
+
+    const dispatcherHook = store.buildReducer<MyBarState, MyBarDispatchers, typeof MyHook>(MyHook, 'myhook');
+
+    dispatcherHook.log('hook before me');
   });
 });
