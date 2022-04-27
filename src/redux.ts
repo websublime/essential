@@ -5,7 +5,7 @@
  * found in the LICENSE file at https://websublime.dev/license
  */
 
-import { AnyAction, configureStore, createListenerMiddleware, createReducer, Store } from '@reduxjs/toolkit';
+import { AnyAction, configureStore, ConfigureStoreOptions, createListenerMiddleware, createReducer, Store } from '@reduxjs/toolkit';
 import { defineStoreOptions, config } from './config';
 
 const listenerMiddleware = createListenerMiddleware();
@@ -22,7 +22,7 @@ const redux: Store<RootState, AnyAction> = configureStore(defineStoreOptions({
     serializableCheck: false
   }).prepend(listenerMiddleware.middleware),
   ...config
-}));
+}) as ConfigureStoreOptions);
 
 export type RootState = ReturnType<typeof rootReducer>;
 export const useRedux = () => ({middleware: listenerMiddleware, store: redux});

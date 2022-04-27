@@ -6,15 +6,16 @@
  */
 
 import { ConfigureStoreOptions } from '@reduxjs/toolkit';
+import { hasBrowserEnvironment } from './helpers';
 import { Environment } from './types';
 
-const env = (process.env.NODE_ENV || 'production') as Environment;
+const env = (hasBrowserEnvironment || process.env.NODE_ENV) as Environment;
 
 const config = {
   devTools: env !== 'production'
 };
 
-const defineStoreOptions = (options: ConfigureStoreOptions) => {
+const defineStoreOptions = (options: Partial<ConfigureStoreOptions>) => {
   return Object.assign(config, options);
 }
 

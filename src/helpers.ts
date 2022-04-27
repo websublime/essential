@@ -14,6 +14,8 @@ export const uniqueID = () => {
   return head + tail;
 };
 
+export const hasBrowserEnvironment = isSsr() ? 'production' : (window.environment || 'production');
+
 // Checks if value is an empty object or collection.
 export const isEmpty = (obj: any) =>
   [Object, Array].includes((obj || {}).constructor) &&

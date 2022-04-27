@@ -9,6 +9,7 @@ import { AnyAction, ConfigureStoreOptions } from '@reduxjs/toolkit';
 import { defineStoreOptions } from './config';
 import { isSsr } from './helpers';
 import { EssentialStore } from './store';
+import { Environment } from './types';
 
 declare global {
   interface EssentialReducer {
@@ -19,11 +20,12 @@ declare global {
   interface EssentialStoreObject {
     store: EssentialStore;
     isStoreAvailable: () => boolean;
-    options: ConfigureStoreOptions;
+    options: Partial<ConfigureStoreOptions>;
   }
 
   interface Window {
     essential: EssentialStoreObject;
+    environment: Environment;
   }
 }
 
@@ -33,7 +35,7 @@ const isStoreAvailable = () => {
   return !!context.essential?.store;
 }
 
-export const useStore = (storeOptions: ConfigureStoreOptions = {} as ConfigureStoreOptions) => {
+export const useStore = (storeOptions: Partial<ConfigureStoreOptions> = {}) => {
   if(!context.essential) {
     const options = defineStoreOptions(storeOptions);
 
