@@ -1,5 +1,11 @@
 # @websublime/essential
 
+## 0.0.3
+
+### Patch Changes
+
+- [`0b340b9`](https://github.com/websublime/essential/commit/0b340b9fb093785e73b7c8be2c20acf15ff73f58) Thanks [@miguelramos](https://github.com/miguelramos)! - Config scoped and removed singleton options
+
 ## 0.0.2
 
 ### Patch Changes
