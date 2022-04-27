@@ -164,7 +164,7 @@ describe('> Store', () => {
     type MyBarState = {log: string};
     type MyBarDispatchers = {log(msg: string): void};
 
-    const LOG_ACTION = createAction<MyBarState>('LOG');
+    const LISTEN_ACTION = createAction<MyBarState>('LISTEN');
 
     class MyBar extends EssentialReducer<MyBarState, MyBarDispatchers> {
       get initial() {
@@ -173,7 +173,7 @@ describe('> Store', () => {
 
       get actions() {
         return [
-          {action: LOG_ACTION, reducer: this.printReducer.bind(this) }
+          {action: LISTEN_ACTION, reducer: this.printReducer.bind(this) }
         ];
       }
 
@@ -183,7 +183,7 @@ describe('> Store', () => {
         };
       }
 
-      private printReducer(state: MyBarState, action: ReturnType<typeof LOG_ACTION>) {
+      private printReducer(state: MyBarState, action: ReturnType<typeof LISTEN_ACTION>) {
         state.log = action.payload.log
 
         return state;
@@ -196,19 +196,19 @@ describe('> Store', () => {
       }
     }
 
-    const dispatcherBar = store.buildReducer<MyBarState, MyBarDispatchers, typeof MyBar>(MyBar, 'mybar');
+    const dispatcherBar = store.buildReducer<MyBarState, MyBarDispatchers, typeof MyBar>(MyBar, 'mylisten');
 
-    const barReducer = store.getReducer<MyBar>('mybar');
+    const barReducer = store.getReducer<MyBar>('mylisten');
 
-    barReducer.addListener(({ state, action }: {state: {mybar: MyBarState}, action: ReturnType<typeof LOG_ACTION> }) => {
-      expect(action.type).toEqual('LOG');
+    barReducer.addListener(({ state, action }: {state: {mylisten: MyBarState}, action: ReturnType<typeof LISTEN_ACTION> }) => {
+      expect(action.type).toEqual('LISTEN');
       expect(action.payload).toEqual({ log: 'Message from space' });
-      expect(state.mybar.log).toEqual('Message from space');
+      expect(state.mylisten.log).toEqual('Message from space');
       done();
     }, 10);
 
     expect(barReducer.initial.log).toEqual(null);
-    expect(barReducer.getReducerState()).toEqual({ log: 'Message from space' });
+    expect(barReducer.getReducerState()).toEqual({ log: null });
 
     dispatcherBar.log('Message from space');
   });
@@ -307,5 +307,9 @@ describe('> Store', () => {
     const dispatcherHook = store.buildReducer<MyBarState, MyBarDispatchers, typeof MyBoot>(MyBoot, 'myboot');
 
     dispatcherHook.log('bootstrap');
+  });
+
+  test('Should remove reducer', () => {
+    expect(store.removeReducer('myboot')).toBeTruthy();
   });
 });
