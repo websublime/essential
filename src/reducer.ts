@@ -128,7 +128,8 @@ export abstract class EssentialReducer<EssentialReducerState = any, EssentialDis
       effect: async (action , api) => {
         const state = api.getState();
 
-        const callbacks = this.listeners.sort((before, after) => after.priority - before.priority).reduce((acc, item) => acc.concat([item.callback]), [] as Array<(args: any) => void>);
+        const callbacks = this.listeners.sort((before, after) => after.priority - before.priority)
+          .reduce((acc, item) => acc.concat([item.callback]), [] as Array<(args: any) => void>);
 
         callbacks.forEach(fn => fn({state, action}));
       }

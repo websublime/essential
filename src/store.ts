@@ -5,7 +5,7 @@
  * found in the LICENSE file at https://websublime.dev/license
  */
 
-import { AnyAction, combineReducers, ConfigureStoreOptions, Store } from '@reduxjs/toolkit';
+import { AnyAction, combineReducers, ConfigureStoreOptions, createReducer, Store } from '@reduxjs/toolkit';
 import { EssentialReducer } from './reducer';
 import { useRedux, setOptions } from './redux';
 import { Constructor } from './types';
@@ -19,6 +19,13 @@ export type EssentialGenericReducer<State = unknown, Dispatchers = unknown> = Es
 export type EssentialConstructReducer<State, Dispatchers, Reducer = unknown> = EssentialGenericReducer<State, Dispatchers> & Constructor<Reducer>;
 
 export class EssentialStore<RootState = any> {
+  /**
+   * Redux and store options.
+   *
+   * @private
+   */
+  private options: Partial<ConfigureStoreOptions>;
+
   /**
    * Reducers instances
    *
@@ -54,7 +61,23 @@ export class EssentialStore<RootState = any> {
   }
 
   constructor(options: Partial<ConfigureStoreOptions>) {
-    setOptions(options);
+    this.options = setOptions(options);
+  }
+
+  /**
+   * Recreate cached reducers
+   *
+   * @private
+   */
+  private recreateCachedReducers(): void {
+    const { store } = this.redux;
+    const reducers = this.reducers.values();
+    const cachedReducers = Array.from(reducers).reduce((acc, item) => acc = {...acc,...item}, {});
+    const reducersList = Array.from(reducers).length
+      ? combineReducers({ ...cachedReducers })
+      : createReducer({}, builder => builder.addDefaultCase((state) => state));
+
+    store.replaceReducer(reducersList);
   }
 
   /**
@@ -80,6 +103,10 @@ export class EssentialStore<RootState = any> {
    * @private
    */
   private bootReducer<State, Dispatchers>(reducer: EssentialGenericReducer<State, Dispatchers>) {
+    if(this.reducers.has(reducer.namespace)) {
+      throw new Error(`Namespace: ${reducer.namespace.toString()} already exist. Is not allowed override existing namespaces.`);
+    }
+
     this.reducers.set(reducer.namespace, this.setupReducer(reducer as EssentialGenericReducer));
     this.connections.set(reducer.namespace, reducer as EssentialGenericReducer);
 
@@ -113,6 +140,23 @@ export class EssentialStore<RootState = any> {
    */
   getReducer<Reducer = EssentialGenericReducer>(namespace: symbol|string): Reducer {
     return this.connections.get(namespace) as unknown as Reducer;
+  }
+
+  /**
+   * Remove reducer from store and recreate it.
+   *
+   * @param namespace - Reducer namespace
+   * @public
+   */
+  removeReducer(namespace: symbol|string): boolean {
+    const sizeBefore = this.connections.size;
+    this.connections.delete(namespace);
+    this.reducers.delete(namespace);
+    const sizeAfter = this.connections.size;
+
+    this.recreateCachedReducers();
+
+    return sizeBefore > sizeAfter;
   }
 
   /*

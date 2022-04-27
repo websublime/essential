@@ -7,7 +7,7 @@ type RootState = {
   }
 };
 
-const store: EssentialStore<RootState> = useStore({ devTools: true });
+const store: EssentialStore<RootState> = useStore();
 
 type MyReducerState = {count: number};
 type MyReducerDispatchers = {increment(count: number): void, decrement(count: number): void};
@@ -87,6 +87,18 @@ decrement.addEventListener('click', (event) => {
   label.textContent = store.state.myreducer.count.toString();
 });
 
+const stop = document.createElement('button');
+stop.textContent = 'Stop';
+stop.addEventListener('click', (event) => {
+  event.preventDefault();
+
+  store.removeReducer('myreducer');
+
+  increment.disabled = true;
+  decrement.disabled = true;
+});
+
 app.appendChild(increment);
 app.appendChild(p);
 app.appendChild(decrement);
+app.appendChild(stop);
