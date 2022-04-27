@@ -1,6 +1,6 @@
 {
   "name": "@websublime/essential",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "source": "./src",
   "main": "./dist/essential.cjs.js",
   "module": "./dist/essential.esm.js",

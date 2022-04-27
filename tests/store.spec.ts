@@ -1,5 +1,5 @@
 import { createAction, Store } from '@reduxjs/toolkit';
-import { EssentialReducer, EssentialStore, useStore } from '../src';
+import { EssentialReducer, EssentialStore, RootState, useStore } from '../src';
 
 describe('> Store', () => {
   let store: EssentialStore = null;
@@ -205,7 +205,7 @@ describe('> Store', () => {
       expect(action.payload).toEqual({ log: 'Message from space' });
       expect(state.mybar.log).toEqual('Message from space');
       done();
-    });
+    }, 10);
 
     expect(barReducer.initial.log).toEqual(null);
     expect(barReducer.getReducerState()).toEqual({ log: 'Message from space' });
@@ -259,5 +259,53 @@ describe('> Store', () => {
     const dispatcherHook = store.buildReducer<MyBarState, MyBarDispatchers, typeof MyHook>(MyHook, 'myhook');
 
     dispatcherHook.log('hook before me');
+  });
+
+  test('Should execute hook bootstrap', (done) => {
+    type MyBarState = {boot: string};
+    type MyBarDispatchers = {log(msg: string): RootState};
+
+    const BOOT_ACTION = createAction<MyBarState>('BOOT');
+
+    class MyBoot extends EssentialReducer<MyBarState, MyBarDispatchers> {
+      get initial() {
+        return { boot: null };
+      }
+
+      get actions() {
+        return [
+          {action: BOOT_ACTION, reducer: this.printReducer.bind(this) }
+        ];
+      }
+
+      get dispatchers(): MyBarDispatchers {
+        return {
+          log: this.printDispatcher.bind(this)
+        };
+      }
+
+      bootstrap(): void {
+        expect(this.initial.boot).toEqual(null);
+        done();
+      }
+
+      private printReducer(state: MyBarState, action: ReturnType<typeof BOOT_ACTION>) {
+        state.boot = action.payload.boot
+
+        return state;
+      }
+
+      private printDispatcher(boot = '') {
+        const [first] = this.actions;
+
+        this.dispatch(first.action({ boot }));
+
+        return this.getState();
+      }
+    }
+
+    const dispatcherHook = store.buildReducer<MyBarState, MyBarDispatchers, typeof MyBoot>(MyBoot, 'myboot');
+
+    dispatcherHook.log('bootstrap');
   });
 });
