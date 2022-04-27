@@ -1,5 +1,11 @@
 # @websublime/essential
 
+## 0.0.2
+
+### Patch Changes
+
+- [`941192c`](https://github.com/websublime/essential/commit/941192c13755a3ad3d11e41974d7b0905b7eae8e) - Config improvement and playground example
+
 ## 0.0.1
 
 ### Patch Changes
