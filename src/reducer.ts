@@ -8,10 +8,10 @@
 import { createReducer, ListenerMiddlewareInstance, isAnyOf, PayloadActionCreator, createAction, AnyAction, Store } from '@reduxjs/toolkit';
 import type { ReducerWithInitialState } from '@reduxjs/toolkit/dist/createReducer';
 import { uniqueID } from './helpers';
-import { useRedux, RootState } from './redux';
+import { useRedux } from './redux';
 import { EssentialReducerActions, EssentialReducerListener, EssentialReducerListenerParams } from './types';
 
-type State<ReducerState> = ReducerState & RootState;
+// type State<ReducerState> = ReducerState & RootState;
 
 export abstract class EssentialReducer<EssentialReducerState = any, EssentialDispatchers = any> {
 
@@ -158,7 +158,7 @@ export abstract class EssentialReducer<EssentialReducerState = any, EssentialDis
   public getState() {
     const { store } = this.redux;
 
-    return store.getState() as State<EssentialReducerState>;
+    return store.getState();
   }
 
   /**
@@ -168,7 +168,7 @@ export abstract class EssentialReducer<EssentialReducerState = any, EssentialDis
    */
   public getReducerState(): EssentialReducerState {
     const { store } = this.redux;
-    const state = store.getState() as State<EssentialReducerState>;
+    const state = store.getState();
 
     return state[this.namespace.toString()];
   }

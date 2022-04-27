@@ -5,10 +5,10 @@
  * found in the LICENSE file at https://websublime.dev/license
  */
 
-export { Environment } from './types';
+export type { Environment } from './types';
 export { useStore } from './main';
 export { EssentialReducer } from './reducer';
 export { EssentialStore } from './store';
-export { RootState } from './redux';
-export { defineStoreOptions } from './config';
-export { createAction, createSelector, Store } from '@reduxjs/toolkit';
+export { setOptions } from './redux';
+export { createAction, createSelector } from '@reduxjs/toolkit';
+export type { Store } from '@reduxjs/toolkit';

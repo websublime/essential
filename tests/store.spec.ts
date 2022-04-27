@@ -1,5 +1,5 @@
 import { createAction, Store } from '@reduxjs/toolkit';
-import { EssentialReducer, EssentialStore, RootState, useStore } from '../src';
+import { EssentialReducer, EssentialStore, useStore } from '../src';
 
 describe('> Store', () => {
   let store: EssentialStore = null;
@@ -263,7 +263,7 @@ describe('> Store', () => {
 
   test('Should execute hook bootstrap', (done) => {
     type MyBarState = {boot: string};
-    type MyBarDispatchers = {log(msg: string): RootState};
+    type MyBarDispatchers = {log(msg: string): any};
 
     const BOOT_ACTION = createAction<MyBarState>('BOOT');
 

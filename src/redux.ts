@@ -5,24 +5,50 @@
  * found in the LICENSE file at https://websublime.dev/license
  */
 
-import { AnyAction, configureStore, ConfigureStoreOptions, createListenerMiddleware, createReducer, Store } from '@reduxjs/toolkit';
-import { defineStoreOptions, config } from './config';
+import { configureStore, ConfigureStoreOptions, createListenerMiddleware, createReducer, Store } from '@reduxjs/toolkit';
 
-const listenerMiddleware = createListenerMiddleware();
+type StoreProvider = {
+  options: Partial<ConfigureStoreOptions>,
+  redux: Store | null;
+  listenerMiddleware: ReturnType<typeof createListenerMiddleware>;
+};
 
-const rootReducer = createReducer<Record<string, any>>({}, (builder) => {
-  builder.addDefaultCase((state) => {
-    return state;
+export const { setOptions, useRedux } = (() => {
+  const scope = {
+    options: {},
+    redux: null,
+    listenerMiddleware: createListenerMiddleware()
+  } as StoreProvider;
+
+  const rootReducer = createReducer({}, (builder) => {
+    builder.addDefaultCase((state) => {
+      return state;
+    });
   });
-});
 
-const redux: Store<RootState, AnyAction> = configureStore(defineStoreOptions({
-  reducer: rootReducer,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
-    serializableCheck: false
-  }).prepend(listenerMiddleware.middleware),
-  ...config
-}) as ConfigureStoreOptions);
+  const provider = {
+    setOptions(options: Partial<ConfigureStoreOptions>) {
+      return scope.options = { ...scope.options, ...options };
+    },
+    useRedux() {
+      if(!scope.redux) {
+        scope.redux = configureStore({
+          reducer: rootReducer,
+          middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+            serializableCheck: false
+          }).prepend(scope.listenerMiddleware.middleware),
+          ...scope.options
+        })
+      }
 
-export type RootState = ReturnType<typeof rootReducer>;
-export const useRedux = () => ({middleware: listenerMiddleware, store: redux});
+      return {
+        store: scope.redux,
+        middleware: scope.listenerMiddleware,
+        root: rootReducer,
+        options: scope.options
+      };
+    }
+  }
+
+  return Object.seal(provider);
+})();

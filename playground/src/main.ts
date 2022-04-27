@@ -1,7 +1,13 @@
 import './style.css'
-import { useStore, createAction, EssentialReducer } from '@websublime/essential';
+import { useStore, createAction, EssentialReducer, EssentialStore } from '@websublime/essential';
 
-const store = useStore({ devTools: true });
+type RootState = {
+  myreducer: {
+    count: number;
+  }
+};
+
+const store: EssentialStore<RootState> = useStore({ devTools: true });
 
 type MyReducerState = {count: number};
 type MyReducerDispatchers = {increment(count: number): void, decrement(count: number): void};
@@ -69,7 +75,7 @@ increment.addEventListener('click', (event) => {
   event.preventDefault();
 
   dispatchers.increment(1);
-  label.textContent = store.state.myreducer.count;
+  label.textContent = store.state.myreducer.count.toString();
 });
 
 const decrement = document.createElement('button');
@@ -78,7 +84,7 @@ decrement.addEventListener('click', (event) => {
   event.preventDefault();
 
   dispatchers.decrement(1);
-  label.textContent = store.state.myreducer.count;
+  label.textContent = store.state.myreducer.count.toString();
 });
 
 app.appendChild(increment);

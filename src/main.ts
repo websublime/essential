@@ -5,11 +5,11 @@
  * found in the LICENSE file at https://websublime.dev/license
  */
 
-import { AnyAction, ConfigureStoreOptions } from '@reduxjs/toolkit';
-import { defineStoreOptions } from './config';
+import type { AnyAction, ConfigureStoreOptions } from '@reduxjs/toolkit';
+
 import { isSsr } from './helpers';
 import { EssentialStore } from './store';
-import { Environment } from './types';
+import type { Environment } from './types';
 
 declare global {
   interface EssentialReducer {
@@ -37,10 +37,13 @@ const isStoreAvailable = () => {
 
 export const useStore = (storeOptions: Partial<ConfigureStoreOptions> = {}) => {
   if(!context.essential) {
-    const options = defineStoreOptions(storeOptions);
+    const options = {
+      devTools: (process.env.NODE_ENV || 'production') !== 'production',
+      ...storeOptions
+    }
 
     context.essential = Object.seal({
-      store: new EssentialStore(),
+      store: new EssentialStore(options),
       isStoreAvailable: isStoreAvailable,
       options
     });

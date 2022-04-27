@@ -5,9 +5,9 @@
  * found in the LICENSE file at https://websublime.dev/license
  */
 
-import { AnyAction, combineReducers } from '@reduxjs/toolkit';
+import { AnyAction, combineReducers, ConfigureStoreOptions, Store } from '@reduxjs/toolkit';
 import { EssentialReducer } from './reducer';
-import { useRedux, RootState } from './redux';
+import { useRedux, setOptions } from './redux';
 import { Constructor } from './types';
 
 export interface EssentialGeneric {
@@ -18,7 +18,7 @@ export interface EssentialGeneric {
 export type EssentialGenericReducer<State = unknown, Dispatchers = unknown> = EssentialReducer<State, Dispatchers> & EssentialGeneric;
 export type EssentialConstructReducer<State, Dispatchers, Reducer = unknown> = EssentialGenericReducer<State, Dispatchers> & Constructor<Reducer>;
 
-export class EssentialStore {
+export class EssentialStore<RootState = any> {
   /**
    * Reducers instances
    *
@@ -38,8 +38,8 @@ export class EssentialStore {
    *
    * @public
    */
-  get state(): RootState {
-    const { store } = this.redux;
+  get state() {
+    const { store }: { store: Store<RootState, AnyAction> } = this.redux;
 
     return store.getState();
   }
@@ -51,6 +51,10 @@ export class EssentialStore {
    */
   private get redux() {
     return useRedux();
+  }
+
+  constructor(options: Partial<ConfigureStoreOptions>) {
+    setOptions(options);
   }
 
   /**

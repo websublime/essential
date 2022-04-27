@@ -25,11 +25,6 @@ This implementation is a vanilla implementation to work on all frameworks or nod
 # Table of contents
 
 - [Usage](#usage)
-  - [String](#string)
-  - [Number](#number)
-  - [Boolean](#boolean)
-  - [Date](#date)
-
 - [Installation](#installation)
 
 # Usage
