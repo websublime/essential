@@ -1,5 +1,11 @@
 # @websublime/essential
 
+## 0.0.1
+
+### Patch Changes
+
+- [`ba6d7fe`](https://github.com/websublime/essential/commit/ba6d7fe8104b957a2dcec8dffedee82539d82ea2) Thanks [@miguelramos](https://github.com/miguelramos)! - Intial release
+
 ## 0.0.2
 
 ### Patch Changes
