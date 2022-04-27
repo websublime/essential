@@ -1,5 +1,11 @@
 # @websublime/essential
 
+## 0.0.4
+
+### Patch Changes
+
+- [`8636370`](https://github.com/websublime/essential/commit/86363703d250e093686288f3388df2e6795d75ce) Thanks [@miguelramos](https://github.com/miguelramos)! - Prevent namespace override and remove reducers
+
 ## 0.0.3
 
 ### Patch Changes
