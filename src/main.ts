@@ -41,10 +41,10 @@ export const useStore = (storeOptions: Partial<ConfigureStoreOptions> = {}) => {
       ...storeOptions
     }
 
-    context.essential = {
+    context.essential = Object.seal({
       store: new EssentialStore(options),
       isStoreAvailable: isStoreAvailable
-    };
+    });
   }
 
   return context.essential.store;

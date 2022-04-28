@@ -200,10 +200,10 @@ describe('> Store', () => {
 
     const barReducer = store.getReducer<MyBar>('mylisten');
 
-    barReducer.addListener(({ state, action }: {state: {mylisten: MyBarState}, action: ReturnType<typeof LISTEN_ACTION> }) => {
+    barReducer.addListener(({ state, action }: {state: MyBarState, action: ReturnType<typeof LISTEN_ACTION> }) => {
       expect(action.type).toEqual('LISTEN');
       expect(action.payload).toEqual({ log: 'Message from space' });
-      expect(state.mylisten.log).toEqual('Message from space');
+      expect(state.log).toEqual('Message from space');
       done();
     }, 10);
 
@@ -307,6 +307,54 @@ describe('> Store', () => {
     const dispatcherHook = store.buildReducer<MyBarState, MyBarDispatchers, typeof MyBoot>(MyBoot, 'myboot');
 
     dispatcherHook.log('bootstrap');
+  });
+
+  test('Should test subscribers', (done) => {
+    type MyBarState = {sub: string};
+    type MyBarDispatchers = {log(msg: string): any};
+
+    const SUB_ACTION = createAction<MyBarState>('SUB');
+
+    class MySub extends EssentialReducer<MyBarState, MyBarDispatchers> {
+      get initial() {
+        return { sub: null };
+      }
+
+      get actions() {
+        return [
+          {action: SUB_ACTION, reducer: this.printReducer.bind(this) }
+        ];
+      }
+
+      get dispatchers(): MyBarDispatchers {
+        return {
+          log: this.printDispatcher.bind(this)
+        };
+      }
+
+      private printReducer(state: MyBarState, action: ReturnType<typeof SUB_ACTION>) {
+        state.sub = action.payload.sub
+
+        return state;
+      }
+
+      private printDispatcher(sub = '') {
+        const [first] = this.actions;
+
+        this.dispatch(first.action({ sub }));
+
+        return this.getState();
+      }
+    }
+
+    const dispatcherHook = store.buildReducer<MyBarState, MyBarDispatchers, typeof MySub>(MySub, 'mysub');
+
+    store.addSubscribers((state) => {
+      expect(state.mysub.sub).toEqual('subscribers');
+      done();
+    });
+
+    dispatcherHook.log('subscribers');
   });
 
   test('Should remove reducer', () => {

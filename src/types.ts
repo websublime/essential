@@ -17,8 +17,8 @@ export interface EssentialReducerListenerParams<State = unknown, Action = AnyAct
   action: Action;
 };
 
-export interface EssentialReducerListener {
-  callback: (args: EssentialReducerListenerParams) => void;
+export interface EssentialReducerListener<State = unknown, Action = AnyAction> {
+  callback: (args: EssentialReducerListenerParams<State, Action>) => void;
   priority: number
 };
 

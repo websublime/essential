@@ -57,7 +57,7 @@ export abstract class EssentialReducer<EssentialReducerState = any, EssentialDis
    *
    * @private
    */
-  private listeners: Array<EssentialReducerListener> = [];
+  private listeners: Array<EssentialReducerListener<EssentialReducerState, AnyAction>> = [];
 
   /**
    * Hook function to customize construct lifecycle
@@ -125,8 +125,8 @@ export abstract class EssentialReducer<EssentialReducerState = any, EssentialDis
 
     listenerMiddleware.startListening({
       matcher: isAnyOf(createAction('INIT_REDUCER'), ...actions),
-      effect: async (action , api) => {
-        const state = api.getState();
+      effect: async (action) => {
+        const state = this.getReducerState();
 
         const callbacks = this.listeners.sort((before, after) => after.priority - before.priority)
           .reduce((acc, item) => acc.concat([item.callback]), [] as Array<(args: any) => void>);
@@ -180,7 +180,7 @@ export abstract class EssentialReducer<EssentialReducerState = any, EssentialDis
    * @param callback - Function to call on reducer state change
    * @param priority - Priority on the stack
    */
-  addListener(callback: (args: EssentialReducerListenerParams) => void, priority = 1) {
+  addListener(callback: (args: EssentialReducerListenerParams<EssentialReducerState, AnyAction>) => void, priority = 1) {
     this.listeners.push({callback, priority});
   }
 }

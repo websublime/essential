@@ -40,6 +40,8 @@ export class EssentialStore<RootState = any> {
    */
   private reducers = new Map<symbol|string, Record<string, any>>();
 
+  private subscribers: Array<(state: RootState) => void> = [];
+
   /**
    * Global state
    *
@@ -62,6 +64,15 @@ export class EssentialStore<RootState = any> {
 
   constructor(options: Partial<ConfigureStoreOptions>) {
     this.options = setOptions(options);
+
+    // TODO: add a remover
+    this.redux.store.subscribe(() => {
+      this.subscribers.forEach(subscriber => {
+        const { store } = this.redux;
+
+        subscriber(store.getState());
+      })
+    });
   }
 
   /**
@@ -157,6 +168,16 @@ export class EssentialStore<RootState = any> {
     this.recreateCachedReducers();
 
     return sizeBefore > sizeAfter;
+  }
+
+  /**
+   * Add a callback function to global state changes
+   * 
+   * @param state - RootState
+   * @public
+   */
+  addSubscribers(subscriber: (state: RootState) => void) {
+    this.subscribers.push(subscriber);
   }
 
   /*
