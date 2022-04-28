@@ -1,5 +1,11 @@
 # @websublime/essential
 
+## 0.0.5
+
+### Patch Changes
+
+- [`e806c6f`](https://github.com/websublime/essential/commit/e806c6fc0846c5fef407404c2705a9320b7ee877) - Object seal prevent observable on vue
+
 ## 0.0.4
 
 ### Patch Changes
