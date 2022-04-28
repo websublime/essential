@@ -1,5 +1,11 @@
 # @websublime/essential
 
+## 0.0.6
+
+### Patch Changes
+
+- [`30499af`](https://github.com/websublime/essential/commit/30499af2828a2b51b8814e15a7159c9a9d7a74bc) - Global sstate subscribers to changes
+
 ## 0.0.5
 
 ### Patch Changes
