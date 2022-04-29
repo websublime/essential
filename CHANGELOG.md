@@ -1,5 +1,11 @@
 # @websublime/essential
 
+## 0.0.7
+
+### Patch Changes
+
+- [`e4788f6`](https://github.com/websublime/essential/commit/e4788f656f5807ae4cdf555637a90eb017f85c42) - Disable namespace check when building reducer
+
 ## 0.0.6
 
 ### Patch Changes
