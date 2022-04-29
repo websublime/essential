@@ -114,9 +114,11 @@ export class EssentialStore<RootState = any> {
    * @private
    */
   private bootReducer<State, Dispatchers>(reducer: EssentialGenericReducer<State, Dispatchers>) {
+    /*
     if(this.reducers.has(reducer.namespace)) {
       throw new Error(`Namespace: ${reducer.namespace.toString()} already exist. Is not allowed override existing namespaces.`);
     }
+    */
 
     this.reducers.set(reducer.namespace, this.setupReducer(reducer as EssentialGenericReducer));
     this.connections.set(reducer.namespace, reducer as EssentialGenericReducer);
