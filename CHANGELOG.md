@@ -1,5 +1,11 @@
 # @websublime/essential
 
+## 0.0.8
+
+### Patch Changes
+
+- [`1f33202`](https://github.com/websublime/essential/commit/1f3320290365a4b6f46fb61b815139dae62ba826) - Node version changed to v16 engine
+
 ## 0.0.7
 
 ### Patch Changes
